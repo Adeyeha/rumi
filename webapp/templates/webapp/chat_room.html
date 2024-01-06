@@ -1,0 +1,143 @@
+{% extends "webapp/base.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<style>
+    /* Styles for messages from the sender (current user) */
+    .message.sender {
+        background-color: #3498db;  /* Blue color */
+        padding: 10px;
+        border-radius: 15px 0px 15px 15px; /* Rounded corners on the left */
+        align-self: flex-end;  /* Align to the right */
+        color: white;  /* White text */
+        max-width: 80%;  /* Limit message width */
+    }
+
+    /* Styles for messages from the receiver (other user) */
+    .message.receiver {
+        background-color: #f1f1f1;  /* Light gray color */
+        padding: 10px;
+        border-radius: 0px 15px 15px 15px; /* Rounded corners on the right */
+        align-self: flex-start;  /* Align to the left */
+        max-width: 80%;  /* Limit message width */
+    }
+</style>
+
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <!-- Chat Box -->
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white d-flex align-items-center justify-content-between">
+                    <span>{{other_user.username|title}}</span>
+                    <a href="{% url 'chat_list' %}" class="btn btn-light">
+                        <i class="fas fa-arrow-left"></i> Back
+                    </a>
+                </div>                
+                <div class="card-body">
+                    <div id="chat-log" class="mb-3 p-3 d-flex flex-column" style="height: 300px; overflow-y: auto; border: 1px solid #e5e5e5;">
+                        {% for chat in chats.all %}
+                            {% if chat.user.id == request.user.id %}
+                                <div class="message receiver mb-2">
+                                    {{ chat.content }}
+                                </div>
+                            {% else %}
+                                <div class="message sender mb-2">
+                                    {{ chat.content }}
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <!-- Message Input and Send button -->
+                    <div class="d-flex">
+                        <div class="form-floating flex-grow-1 mr-3"> <!-- Increased margin here -->
+                            <input type="text" class="form-control" id="chat-message-input" placeholder="Enter your message..." maxlength="900">
+                            <label for="chat-message-input">Type your message...</label>
+                        </div>
+                        <button class="btn btn-primary" id="chat-message-submit" type="button">
+                            <i class="fas fa-paper-plane"></i> Send
+                        </button>
+                    </div>
+                    {{ room_name|json_script:"room-name" }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const chatLog = document.querySelector('#chat-log')
+    const roomName = JSON.parse(document.getElementById('room-name').textContent);
+
+    if (chatLog.childNodes.length <= 1) {
+        const emptyText = document.createElement('h3')
+        emptyText.id = 'emptyText'
+        emptyText.innerText = 'No Messages'
+        emptyText.className = 'emptyText'
+        chatLog.appendChild(emptyText)
+    }
+
+    // const chatSocket = new WebSocket(
+    //     'ws://'
+    //     + window.location.host
+    //     + '/ws/chat/'
+    //     + roomName
+    //     + '/'
+    // );
+
+        const chatSocket = new WebSocket(
+        (window.location.protocol === "https:" ? "wss://" : "ws://") 
+        + window.location.host 
+        + '/ws/chat/' 
+        + roomName 
+        + '/'
+    );
+
+    chatSocket.onmessage = function(e) {
+        const data = JSON.parse(e.data);
+        const messageElement = document.createElement('div')
+        const userId = data['user_id']
+        const loggedInUserId = "{{request.user.id}}"
+        console.log(loggedInUserId)
+        messageElement.innerText = data.message
+        
+        if (userId === loggedInUserId) {
+            messageElement.classList.add('message', 'sender')
+        } else {
+            messageElement.classList.add('message', 'receiver')
+        }
+
+        chatLog.appendChild(messageElement)
+
+        if (document.querySelector('#emptyText')) {
+            document.querySelector('#emptyText').remove()
+        }
+    };
+
+    chatSocket.onclose = function(e) {
+        console.error('Chat socket closed unexpectedly');
+    };
+
+    document.querySelector('#chat-message-input').focus();
+    document.querySelector('#chat-message-input').onkeyup = function(e) {
+        if (e.keyCode === 13) {  // enter, return
+            document.querySelector('#chat-message-submit').click();
+        }
+    };
+
+    document.querySelector('#chat-message-submit').onclick = function(e) {
+        const messageInputDom = document.querySelector('#chat-message-input');
+        const message = messageInputDom.value;
+        chatSocket.send(JSON.stringify({
+            'message': message
+        }));
+        messageInputDom.value = '';
+    };
+</script>
+{% endblock %}
+
+

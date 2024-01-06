@@ -1,0 +1,163 @@
+{% extends "webapp/base.html" %}
+{% load custom_filters %}
+{% block extra_css %}
+{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <!-- User Profile Information -->
+        <div class="col-md-6">
+        <!-- Profile Information Card -->
+        <div class="card mb-4">
+            <div class="card-header">
+                Profile Information
+            </div>
+            <div class="card-body d-flex justify-content-between align-items-center">
+                <!-- Profile Details on the left -->
+                <div>
+                    <h4>{{ user_profile.user.username }}</h4>
+                    <p>Name: {{ user_profile.user.first_name }} {{ user_profile.user.last_name }}</p>
+                    <p>Age: {{ user_profile.get_age }} yrs</p>
+                    <p>City: {{ user_profile.city }}</p>
+                    <p>Occupation: {{ user_profile.occupation }}</p>
+                    <p>Sex: {{ user_profile.sex }}</p>
+                    <p>Education: {{ user_profile.education }}</p>
+                    <p>Move-in Date: {{ user_profile.move_in_date }}</p>
+                    <p>About: {{ user_profile.about }}</p>
+                </div>
+
+                <!-- Profile Picture on the right -->
+                <div>
+                    {% if user_profile.profile_picture %}
+                        <img src="{{ user_profile.profile_picture.url }}" alt="{{ user_profile.user.username }}" class="rounded-circle profile-img" width="60" height="70">
+                    {% else %}
+                        <!-- SVG placeholder for profile picture -->
+                        <svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="rounded-circle profile-pic" id="profilePicPreview">
+                            <circle cx="50" cy="50" r="50" fill="#E0E0E0"/>
+                            <circle cx="50" cy="40" r="30" fill="#9E9E9E"/>
+                            <rect x="20" y="70" width="60" height="30" rx="10" fill="#9E9E9E"/>
+                        </svg>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+            
+
+            <!-- User Preferences -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Roommate Preferences
+                </div>
+                <div class="card-body">
+                    <p>Sleep Hours: {{ roommate_preferences.sleep_hours }}</p>
+                    <p>Drinks: {{ roommate_preferences.drinks }}</p>
+                    <p>Drugs: {{ roommate_preferences.drugs }}</p>
+                    <p>Smoke: {{ roommate_preferences.smoke }}</p>
+                    <p>Loud Music: {{ roommate_preferences.loud_music }}</p>
+                    <p>Number of Rooms: {{ roommate_preferences.rooms }}</p>
+                    <p>Budget: {{ roommate_preferences.budget }}</p>
+                    <p>Meals per Day: {{ roommate_preferences.meals }}</p>
+                </div>
+            </div>
+
+            <!-- User Interests and Pets -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    Interests and Pets
+                </div>
+                <div class="card-body">
+                    <p>Interests: 
+                        {% for interest in user_interests.interests.all %}
+                            {{ interest.name }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </p>
+                    <p>Own Pets: 
+                        {% for pet in user_pets.pets.all %}
+                            {{ pet.name }}{% if not forloop.last %},{% endif %}
+                        {% endfor %}
+                    </p>                    
+                </div>
+            </div>          
+
+        </div>
+
+        <!-- Radar Graph using Chart.js -->
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-header">
+                    Preferences Radar Graph
+                </div>
+                <div class="card-body">
+                    <canvas id="radarChart" width="400" height="400"></canvas>
+                </div>
+            </div>
+
+            <div class="card mb-4">
+                <div class="card-body d-flex justify-content-between">
+                    <!-- Always show message icon -->
+                        <a href="{% url 'chat' request.user.id|concat:user_profile.user.id %}" title="Chats"><i class="fas fa-comment fa-2x"></i></a>
+                    {% if status == "accepted" %}
+                        <a href="{% url 'reject_interest' interest_id=user_interest_id %}" title="Decline" data-interest-id="{{ user_interest_id }}" class="text-danger"><i class="fas fa-times-circle fa-2x"></i></a>
+                    
+                    {% elif status == "rejected" %}
+                        <a href="{% url 'accept_interest' interest_id=user_interest_id %}" title="Accept" data-interest-id="{{ user_interest_id }}" class="text-success"><i class="fas fa-check fa-2x"></i></a>
+                    
+                    {% elif status == "pending" %}
+                        {% if user_interest_id == request.user.id %}
+                        <a href="{% url 'accept_interest' interest_id=user_interest_id %}" title="Accept" data-interest-id="{{ user_interest_id }}" class="text-success"><i class="fas fa-check fa-2x"></i></a>
+                        <a href="{% url 'reject_interest' interest_id=user_interest_id %}" title="Decline" data-interest-id="{{ user_interest_id }}" class="text-danger"><i class="fas fa-times-circle fa-2x"></i></a>
+                        {% else %}
+                        <a href="{% url 'request_connection' user_profile.user.id %}" title="Send Request"><i class="fas fa-paper-plane fa-2x"></i></a>
+                        {% endif %}
+                    {% else %}
+                        <a href="{% url 'request_connection' user_profile.user.id %}" title="Send Request"><i class="fas fa-paper-plane fa-2x"></i></a>
+                    {% endif %}
+                </div>
+            </div>
+            
+            
+            </div>  
+
+        </div>
+
+    </div>
+</div>
+
+
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    var ctx = document.getElementById('radarChart').getContext('2d');
+    var radarChart = new Chart(ctx, {
+        type: 'radar',
+        data: {
+            labels: ['Drinks','Sleep Hours', 'Drugs', 'Smoke', 'Loud Music', 'Rooms', 'Budget', 'Meals'],
+            datasets: [{
+                label: 'You',
+                data: {{self_data}}, // replace 0 with actual values if available
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)',
+                borderWidth: 1
+            },{
+                label: '{{roommate_preferences.user.username}}',
+                data: {{other_data}}, // replace 0 with actual values if available
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255, 99, 132, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scale: {
+                ticks: {
+                    beginAtZero: true,
+                    max: 10
+                }
+            }
+        }
+    });
+</script>
+
+{% endblock %}

@@ -1,0 +1,73 @@
+{% extends "webapp/base.html" %}
+{% load crispy_forms_tags %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow mb-5">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">Chats</h4>
+                </div>
+                <div class="card-body">
+                    {% for chat in chats_with_users %}
+                    <div class="card custom-card mb-3 border">
+                        <div class="row no-gutters align-items-center">
+                            <!-- Profile Image -->
+                            <div class="col-3 d-flex justify-content-center">
+                                <!-- <a href="{% url 'user_detail' chat.other_user.id %}"> -->
+                                    <img src="{% if chat.image_url %}{{ chat.image_url }}{% else %}{% static 'webapp/blank-profile-picture-973460_640.webp' %}{% endif %}" alt="{{ chat.other_user.username }}" class="rounded-circle profile-img" width="60" height="70">
+                                <!-- </a> -->
+                            </div>                            
+                            <!-- Textual Information -->
+                            <div class="col-6">
+                                <strong> <h5 class="card-title">{{ chat.other_user.username }}</h5></strong>
+                                <!-- Using CSS to limit the chat message to a single line and display ellipsis if it overflows -->
+                                <p class="single-line-text">{{ chat.last_message }}</p>
+                                <small class="text-muted">{{ chat.last_message_time }}</small>
+                            </div>
+                            <!-- Font Awesome Icon -->
+                            <div class="col-3 d-flex justify-content-center">
+                                <a href="{% url 'chat' chat.room_name %}" class="btn btn-sm btn-primary" title="Chat">
+                                    <i class="fas fa-comment-dots"></i> Open
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                    <div class="col-12">
+                        <p class="text-center text-muted">You have no active chats.</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>  
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    .single-line-text {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 250px;  /* Adjust as needed */
+    }
+    .profile-img {
+        max-width: 100%;
+        border: 2px solid #ddd;
+    }
+    .custom-card {
+        border-radius: 8px;
+        transition: box-shadow .3s;
+        padding: 10px 0;  /* This will add 10px padding to the top and bottom */
+    }
+    .custom-card:hover {
+        box-shadow: 0 4px 10px 0 rgba(0, 0, 0, 0.1);
+    }
+
+</style>
+{% endblock %}

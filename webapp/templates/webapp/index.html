@@ -1,0 +1,49 @@
+{% extends 'webapp/base.html' %}
+
+{% block title %}
+    Find Your Perfect Roommate
+{% endblock %}
+
+{% block content %}
+    <!-- Hero Section -->
+    <section class="hero-section text-center py-5">
+        <div class="row">
+            <h1>Find Your Perfect Roommate with Rumi</h1>
+            <h5>Connecting people looking for a place with those looking for a roommate.</h5>
+            <p>Discover your perfect match today!</p>
+            <p><a href="{% url 'register' %}" class="btn btn-lg btn-primary">Get Started</a></p>
+        </div>
+    </section>
+
+    <!-- Features Section -->
+    <section class="features-section py-5 bg-light">
+        <div class="container">
+            <div class="row">
+                <!-- Feature 1 -->
+                <div class="col-md-4 text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-users"></i>  <!-- Icon for "Personalized Matches" -->
+                    </div>
+                    <h3>Personalized Matches</h3>
+                    <p>We match you based on shared preferences and lifestyles.</p>
+                </div>
+                <!-- Feature 2 -->
+                <div class="col-md-4 text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-lock"></i>  <!-- Icon for "Secure Messaging" -->
+                    </div>
+                    <h3>Secure Messaging</h3>
+                    <p>Chat securely with potential roommates within our platform.</p>
+                </div>
+                <!-- Feature 3 -->
+                <div class="col-md-4 text-center">
+                    <div class="feature-icon">
+                        <i class="fas fa-star"></i>  <!-- Icon for "User Reviews" -->
+                    </div>
+                    <h3>User Reviews</h3>
+                    <p>Get to know your potential roommate through reviews and ratings.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}

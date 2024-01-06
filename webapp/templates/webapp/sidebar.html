@@ -1,0 +1,65 @@
+{% extends 'webapp/base.html' %}
+
+{% block title %}
+    Rumi - {% block page_title %}{% endblock %}
+{% endblock %}
+
+{% block extra_css %}
+    <!-- Additional CSS specific to pages extending this template -->
+    {% block page_extra_css %}{% endblock %}
+{% endblock %}
+
+{% block content %}
+<!-- Main Wrapper -->
+<div class="d-flex toggled" id="wrapper">
+    
+    <!-- Sidebar -->
+    <div class="border-end bg-white" id="sidebar-wrapper">
+        <div class="sidebar-heading border-bottom bg-light">Menu</div>
+        <div class="list-group list-group-flush">
+            <a href="{% url 'dashboard' %}" class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.path == '/dashboard/' %}active{% endif %}">
+                <i class="fas fa-tachometer-alt"></i> Dashboard
+            </a>            
+            <a href="{% url 'profile' %}" class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.path == '/find-roommates/' %}active{% endif %}">
+                <i class="fas fa-user-friends"></i> Find Roommates
+            </a>
+            <a href="{% url 'profile' %}" class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.path == '/messages/' %}active{% endif %}">
+                <i class="fas fa-comment-dots"></i> Messages
+            </a>
+            <a href="{% url 'profile' %}" class="list-group-item list-group-item-action list-group-item-light p-3 {% if request.path == '/edit-profile/' %}active{% endif %}">
+                <i class="fas fa-user-edit"></i> Edit Profile
+            </a>
+            <!-- More sidebar items here -->
+        </div>
+    </div>
+
+
+    <!-- Page Content -->
+    <div id="page-content-wrapper">
+        <!-- Toggle Button for Small Screens -->
+        <div class="container-fluid">
+            <button class="btn btn-primary" id="sidebarToggle"><i class="fas fa-angle-double-left"></i></button>
+        </div>
+
+        <!-- Dynamic Dashboard Content -->
+        <div class="container-fluid px-4">
+            {% block page_content %}{% endblock %}
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+    <!-- JS specific to sidebar functionality -->
+    <script>
+        document.addEventListener("DOMContentLoaded", function(){
+            document.getElementById("sidebarToggle").addEventListener("click", function() {
+                var wrapper = document.getElementById("wrapper");
+                wrapper.classList.toggle("toggled");
+            });
+        });
+    </script>
+    {% block page_extra_js %}{% endblock %}
+{% endblock %}

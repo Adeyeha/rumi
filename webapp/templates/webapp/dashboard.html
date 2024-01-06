@@ -1,0 +1,97 @@
+{% extends "webapp/base.html" %}
+{% load custom_filters %}
+{% load static %}
+{% block content %}
+<div class="container mt-5">
+    <!-- User Profile Card -->
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Roommates Requests</h4>
+                    <!-- Input fields for user profile -->
+                    {% for roommate in unconfirmed_roommates %}
+                    <div class="card custom-card mb-3">
+                        <div class="row no-gutters">
+                            <!-- Profile Image -->
+                            <div class="col-4 col-md-3 d-flex align-items-center justify-content-center">
+                                <!-- <a href="{% url 'user_detail' roommate.id %}"> -->
+                                    <img src="{% if roommate.image_url %}{{ roommate.image_url }}{% else %}{% static 'webapp/blank-profile-picture-973460_640.webp' %}{% endif %}" alt="{{ roommate.name }}" class="rounded-circle profile-img" width="60" height="70">
+                                <!-- </a> -->
+                            </div>
+                            <!-- Textual Information -->
+                            <div class="col-8 col-md-9">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ roommate.name }}</h5>
+                                    <p class="card-text">{{ roommate.bio }}</p>
+                                    <p class="card-text">Age: {{ roommate.age }}</p>
+                                    <p class="card-text">Gender: {{ roommate.gender }}</p>
+                                    <!-- Action Icons -->
+                                    <div class="action-icons">
+                                        <a href="{% url 'user_detail' user_id=roommate.id %}" title="View Profile"><i class="fas fa-user fa-sm col-md-1"></i></a>
+                                        <a href="{% url 'chat' request.user.id|concat:roommate.id %}" title="Chat"><i class="fas fa-comment fa-sm col-md-1"></i></a> 
+                                        <a href="{% url 'accept_interest' interest_id=roommate.interest %}" title="Confirm" class="text-success"><i class="fas fa-check fa-sm col-md-1"></i></a>
+                                        <a href="{% url 'reject_interest' interest_id=roommate.interest %}" title="Decline" class="text-danger"><i class="fas fa-times-circle fa-sm"></i></a>
+                                    </div>
+
+                                </div>
+                            </div>
+                        </div>
+                    </div>                    
+                    {% empty %}
+                        <div class="col-12">
+                            <p>No roommate requests found.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h4 class="mb-3">Confirmed Roommates</h4>
+                    <!-- Input fields for user profile -->
+                    {% for roommate in confirmed_roommates %}
+                    <div class="card custom-card mb-3">
+                        <div class="row no-gutters">
+                            <!-- Profile Image -->
+                            <div class="col-4 col-md-3 d-flex align-items-center justify-content-center">
+                                <!-- <a href="{% url 'user_detail' roommate.id %}"> -->
+                                    <img src="{% if roommate.image_url %}{{ roommate.image_url }}{% else %}{% static 'webapp/blank-profile-picture-973460_640.webp' %}{% endif %}" alt="{{ roommate.name }}" class="rounded-circle profile-img"  width="70" height="70">
+                                <!-- </a> -->
+                            </div>
+                            <!-- Textual Information -->
+                            <div class="col-8 col-md-9">
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ roommate.name }}</h5>
+                                    <p class="card-text">{{ roommate.bio }}</p>
+                                    <p class="card-text">Age: {{ roommate.age }}</p>
+                                    <p class="card-text">Gender: {{ roommate.gender }}</p>
+                                    <!-- Action Icons -->
+                                    <div class="action-icons">
+                                        <a href="{% url 'user_detail' user_id=roommate.id %}" title="View Profile"><i class="fas fa-user fa-sm col-md-1"></i></a>
+                                        <a href="{% url 'chat' request.user.id|concat:roommate.id %}" title="Chat"><i class="fas fa-comment fa-sm col-md-1"></i></a> 
+                                        <a href="{% url 'reject_interest' interest_id=roommate.interest %}" title="Decline" class="text-danger"><i class="fas fa-times-circle fa-sm"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <p>No confirmed roommates found.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>        
+    </div>
+</div>
+<style>
+    .profile-img {
+        max-width: 100%;
+        border: 2px solid #ddd;
+    }
+
+</style>
+{%endblock%}

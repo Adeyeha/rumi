@@ -1,0 +1,228 @@
+{% extends "webapp/base.html" %}
+
+{% load static %}
+
+{% block content %}
+<div class="container mt-5">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        
+        <!-- User Profile Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-3">User Profile</h4>
+
+                <!-- Profile Picture Section -->
+                <div class="text-center mb-4">
+                    <div>
+                        {% if image_url %}
+                            <img src="{{ image_url }}" class="rounded-circle profile-img" width="60" height="90" id="profilePicPreview">
+                        {% else %}
+                            <img src="{% static 'webapp/blank-profile-picture-973460_640.webp' %}" class="rounded-circle profile-img" width="60" height="70" id="profilePicPreview">
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mt-2">
+                        <label for="{{userform.profile_picture.auto_id }}" class="btn btn-primary">Upload Picture</label>
+                        <input type="file" name="{{ userform.profile_picture.name }}" id="{{ userform.profile_picture.auto_id }}" class="d-none" accept="image/*" onchange="previewProfilePic()">
+                    </div>
+                </div>
+
+                <!-- Input fields for user profile -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3">
+                            {{ userform.dob }}
+                            <label for="{{ userform.dob.auto_id }}">DOB</label>
+                        </div>
+                        <div class="form-floating mb-3 select-wrapper">
+                            {{ userform.city }}
+                            <label for="{{ userform.city.auto_id }}">City</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ userform.occupation }}
+                            <label for="{{ userform.occupation.auto_id }}">Occupation</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-floating mb-3 select-wrapper">
+                            {{ userform.sex }}
+                            <label for="{{ userform.sex.auto_id }}">Gender</label>
+                        </div>
+                        <div class="form-floating mb-3 select-wrapper">
+                            {{ userform.education }}
+                            <label for="{{ userform.education.auto_id }}">Education</label>
+                        </div>
+                        <div class="form-floating mb-3">
+                            {{ userform.move_in_date }}
+                            <label for="{{ userform.move_in_date.auto_id }}">Move-in Date</label>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="form-floating mb-3">
+                            {{ userform.about }}
+                            <label for="{{ userform.about.auto_id }}">About You</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Roommate Preferences Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-3">Roommate Preferences</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <!-- Select inputs for roommate preferences -->
+                        <div class="form-floating mb-3 select-wrapper">
+                            {{ preferenceform.loud_music }}
+                            <label for="{{ preferenceform.loud_music.auto_id }}">Loud Music</label>
+                        </div>
+                        <div class="form-floating mb-3 select-wrapper">
+                            {{ preferenceform.drinks }}
+                            <label for="{{ preferenceform.drinks.auto_id }}">Drinks</label>
+                        </div>
+                        <div class="form-floating mb-3 select-wrapper">
+                            {{ preferenceform.drugs }}
+                            <label for="{{ preferenceform.drugs.auto_id }}">Drugs</label>
+                        </div>
+                        <div class="form-floating mb-3 select-wrapper">
+                            {{ preferenceform.smoke }}
+                            <label for="{{ preferenceform.smoke.auto_id }}">Smoke</label>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <!-- Sliders for roommate preferences -->
+                        <label for="{{ preferenceform.sleep_hours.auto_id }}">Sleep Hours</label>
+                        <div class="slidecontainer">
+                            <input type="range" min="1" max="16" value="{{ preferenceform.sleep_hours.value }}" class="slider" id="{{ preferenceform.sleep_hours.auto_id }}" name="{{ preferenceform.sleep_hours.name }}">
+                            <span id="sleepDemo"></span>
+                        </div>
+                        <label for="{{ preferenceform.budget.auto_id }}">Rent Range ($)</label>
+                        <div class="slidecontainer">
+                            <input type="range" min="200" max="4000" value="{{ preferenceform.budget.value }}" class="slider" id="{{ preferenceform.budget.auto_id }}" name="{{ preferenceform.budget.name }}">
+                            <span id="budgetDemo"></span>
+                        </div>
+                        <label for="{{ preferenceform.meals.auto_id }}">No of meals cooked per week</label>
+                        <div class="slidecontainer">
+                            <input type="range" min="1" max="7" value="{{ preferenceform.meals.value }}" class="slider" id="{{ preferenceform.meals.auto_id }}" name="{{ preferenceform.meals.name }}">
+                            <span id="mealDemo"></span>
+                        </div>
+                        <label for="{{ preferenceform.rooms.auto_id }}">No of roommates looking for</label>
+                        <div class="slidecontainer">
+                            <input type="range" min="1" max="7" value="{{ preferenceform.rooms.value }}" class="slider" id="{{ preferenceform.rooms.auto_id }}" name="{{ preferenceform.rooms.name }}">
+                            <span id="roomDemo"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Interests Card -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-3">Interests</h4>
+                <div class="row">
+                    {% for field in interestform.interests %}
+                        {% if not forloop.first %}
+                            <div class="col-md-3">
+                                <div class="form-check mb-3">
+                                    {{field}}
+                                </div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Pets Card  -->
+        <div class="card mb-4">
+            <div class="card-body">
+                <h4 class="mb-3">Select Your Pets</h4>
+                <div class="row">
+                    {% for field in petform.pets %}
+                            <div class="col-md-3">
+                                <div class="form-check mb-3">
+                                    {{field}}
+                                </div>
+                            </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="button-container">
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+        </div>
+    </form>
+</div>
+
+<style>
+    .profile-img {
+        max-width: 15%;
+        border: 2px solid #ddd;
+    }
+
+</style>
+
+<script>
+    // Display value for rent range
+    var rentSlider = document.getElementById("{{ preferenceform.budget.auto_id }}");
+    var rentOutput = document.getElementById("budgetDemo");
+    rentOutput.innerHTML = rentSlider.value;
+
+    rentSlider.oninput = function() {
+        rentOutput.innerHTML = this.value;
+    }
+
+    // Display value for meals per week
+    var mealsSlider = document.getElementById("{{ preferenceform.meals.auto_id }}"); // changed meal to meals
+    var mealsOutput = document.getElementById("mealDemo");
+    mealsOutput.innerHTML = mealsSlider.value;
+
+    mealsSlider.oninput = function() {
+        mealsOutput.innerHTML = this.value;
+    }
+
+    // Display value for rooms range
+    var roomSlider = document.getElementById("{{ preferenceform.rooms.auto_id }}"); // changed room to rooms
+    var roomOutput = document.getElementById("roomDemo");
+    roomOutput.innerHTML = roomSlider.value;
+
+    roomSlider.oninput = function() {
+        roomOutput.innerHTML = this.value;
+    }
+
+    // Display value for seephours range
+    var sleepSlider = document.getElementById("{{ preferenceform.sleep_hours.auto_id }}"); // changed room to rooms
+    var sleepOutput = document.getElementById("sleepDemo");
+    sleepOutput.innerHTML = sleepSlider.value;
+
+    sleepSlider.oninput = function() {
+        sleepOutput.innerHTML = this.value;
+    }
+
+function previewProfilePic() {
+    const fileInput = document.getElementById("{{ userform.profile_picture.auto_id }}");
+    const profilePicPreview = document.getElementById("profilePicPreview");
+    const file = fileInput.files[0];
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(event) {
+            profilePicPreview.src = event.target.result;
+        };
+        reader.readAsDataURL(file);
+    } else {
+        // Reset to the original image URL if no file is selected
+        profilePicPreview.src = "{{ image_url }}";
+    }
+}
+
+</script>
+
+{% endblock %}

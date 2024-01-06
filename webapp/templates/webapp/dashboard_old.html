@@ -1,0 +1,76 @@
+{% extends 'webapp/sidebar.html' %}
+
+{% block page_title %}Dashboard{% endblock %}
+
+{% block page_content %}
+
+<div class="container-fluid">
+    <div class="row">
+        <!-- Left Side Content -->
+        <div class="col-md-6">
+            <!-- Dashboard Specific Content -->
+            <section class="matched-roommates">
+                <h2 class="mt-4">Matched Roommates</h2>
+                <div class="row">
+                    {% for roommate in matched_roommates %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <img src="{{ roommate.image_url }}" class="card-img-top" alt="{{ roommate.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ roommate.name }}</h5>
+                                <p class="card-text">{{ roommate.bio }}<br>
+                                   Age: {{ roommate.age }}<br>
+                                   Gender: {{ roommate.gender }}</p>
+                                <div class="action-buttons">
+                                    <a href="{% url 'roommate_profile' roommate.id %}" class="btn btn-primary"><i class="fas fa-user"></i> View Profile</a>
+                                    <a href="#" class="btn btn-secondary"><i class="fas fa-envelope"></i> Message</a>
+                                    <a href="#" class="btn btn-success"><i class="fas fa-user-check"></i> Confirm</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <p>No matched roommates found.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- Right Side Content -->
+        <div class="col-md-6">
+            <!-- Matched Roommates Section -->
+            <section class="matched-roommates">
+                <h2 class="mt-4">Matched Roommates</h2>
+                <div class="row">
+                    {% for roommate in matched_roommates %}
+                    <div class="col-md-6 mb-4">
+                        <div class="card">
+                            <img src="{{ roommate.image_url }}" class="card-img-top" alt="{{ roommate.name }}">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ roommate.name }}</h5>
+                                <p class="card-text">{{ roommate.bio }}<br>
+                                   Age: {{ roommate.age }}<br>
+                                   Gender: {{ roommate.gender }}</p>
+                                <div class="action-buttons">
+                                    <a href="{% url 'roommate_profile' roommate.id %}" class="btn btn-primary"><i class="fas fa-user"></i> View Profile</a>
+                                    <a href="#" class="btn btn-secondary"><i class="fas fa-envelope"></i> Message</a>
+                                    <a href="#" class="btn btn-success"><i class="fas fa-user-check"></i> Confirm</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% empty %}
+                        <div class="col-12">
+                            <p>No matched roommates found.</p>
+                        </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+    </div>
+</div>
+
+<!-- Additional dashboard content can be added below -->
+{% endblock %}
